@@ -1,6 +1,7 @@
 # 运营助手 Agent
 
 一个功能强大的运营助手应用，支持AI对话、数据分析、任务管理和内容创作。
+<img width="1883" height="782" alt="image" src="https://github.com/user-attachments/assets/7eb872a5-15dd-4372-9edb-a99907a162b2" />
 
 ## ✨ 功能特性
 
