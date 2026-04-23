@@ -123,19 +123,21 @@ ALI_API_KEY=your_api_key
 ## 📸 功能截图
 
 ### 1. 聊天界面
-![聊天界面](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chat%20interface%20of%20operation%20assistant%20with%20orange%20theme%20showing%20AI%20conversation&image_size=landscape_16_9)
+![聊天界面](https://img.shields.io/badge/聊天界面-功能正常-green?style=for-the-badge)
 
 ### 2. 数据分析仪表盘
-![数据分析仪表盘](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=data%20dashboard%20with%20charts%20and%20metrics%20in%20orange%20theme&image_size=landscape_16_9)
+![数据分析仪表盘](https://img.shields.io/badge/数据分析-功能正常-green?style=for-the-badge)
 
 ### 3. 任务管理
-![任务管理](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=task%20management%20interface%20with%20task%20cards%20in%20orange%20theme&image_size=landscape_16_9)
+![任务管理](https://img.shields.io/badge/任务管理-功能正常-green?style=for-the-badge)
 
 ### 4. 内容创作
-![内容创作](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=content%20creation%20interface%20with%20editor%20and%20optimization%20tools%20in%20orange%20theme&image_size=landscape_16_9)
+![内容创作](https://img.shields.io/badge/内容创作-功能正常-green?style=for-the-badge)
 
 ### 5. 设置页面
-![设置页面](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=settings%20page%20for%20AI%20model%20configuration%20in%20orange%20theme&image_size=landscape_16_9)
+![设置页面](https://img.shields.io/badge/设置页面-功能正常-green?style=for-the-badge)
+
+**说明**：由于图片生成服务暂时不可用，以上为功能状态标识。实际使用时，各功能界面会显示完整的操作界面。
 
 ## 🤝 贡献
 
