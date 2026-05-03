@@ -1,22 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import ChatView from './components/ChatView'
-import DashboardView from './components/DashboardView'
-import TasksView from './components/TasksView'
+import PositionView from './components/PositionView'
 import ContentView from './components/ContentView'
 import SettingsView from './components/SettingsView'
+import { useThemeStore } from './stores/useThemeStore'
+
+type View = 'chat' | 'position' | 'content' | 'settings'
 
 function App() {
-  const [currentView, setCurrentView] = useState<string>('chat')
+  const [currentView, setCurrentView] = useState<View>('chat')
+  const theme = useThemeStore((s) => s.theme)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   const renderView = () => {
     switch (currentView) {
       case 'chat':
         return <ChatView />
-      case 'dashboard':
-        return <DashboardView />
-      case 'tasks':
-        return <TasksView />
+      case 'position':
+        return <PositionView />
       case 'content':
         return <ContentView />
       case 'settings':
@@ -27,12 +32,9 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar 
-        currentView={currentView} 
-        onViewChange={setCurrentView} 
-      />
-      <div className="flex-1 overflow-auto">
+    <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
+      <div className="flex-1 overflow-hidden">
         {renderView()}
       </div>
     </div>

@@ -1,44 +1,55 @@
-# 运营助手 Agent
+# 运营 AI 内容助手
 
-一个功能强大的运营助手应用，支持AI对话、数据分析、任务管理和内容创作。
+一个面向自媒体运营人的 AI 内容生成工具，支持账号定位、多平台内容创作和智能对话。
 
-## ✨ 功能特性
-<img width="1883" height="782" alt="image" src="https://github.com/user-attachments/assets/fbf52d1f-45fa-423d-be87-eb9bda0977c6" />
+## 功能特性
 
-### 🤖 AI 对话
-- 支持阿里千问大模型
-- 多轮对话能力
-- 上下文理解
-- 针对运营问题的专业回答
+### AI 聊天助手
+- 对话式运营问答，支持多轮对话
+- 快捷提示词：追踪热点、策划选题、润色文章、分析数据
+- 流式输出，实时显示 AI 回复
+- Markdown 格式渲染
 
-### 📊 数据分析
-- 运营数据仪表盘
-- 关键指标监控
-- 趋势分析图表
-- 数据洞察建议
+### 账号定位
+- 输入兴趣/擅长领域，AI 分析最佳赛道
+- 人设定位建议（专业型/亲和型/搞笑型等）
+- 差异化策略和切入点分析
+- 第一周起号计划生成
 
-### ✅ 任务管理
-- 任务创建和跟踪
-- 任务状态管理
-- 任务优先级设置
-- 任务历史记录
+### 多平台内容创作
+- **小红书**：种草图文风格，emoji 丰富，短段落
+- **抖音**：长文图文脚本，节奏感强，口语化
+- **公众号**：长文模式（深度）+ 贴图短文模式（轻量）
+- 一键复制生成内容
+- 历史草稿管理（最多 50 条）
 
-### ✍️ 内容创作
-- 智能内容优化
-- 热点话题分析
-- 标题生成建议
-- 内容结构优化
+### 支持的 AI 模型
+| 模型 | 提供商 | 特点 |
+|------|--------|------|
+| 通义千问 | 阿里云 | 中文能力强，性价比高 |
+| DeepSeek | 深度求索 | 推理能力强，价格实惠 |
+| Kimi | 月之暗面 | 长文本理解能力强 |
+| 豆包 | 字节跳动 | 需配置 endpoint ID |
+| 文心一言 | 百度 | 国内最早的大模型之一 |
 
-## 🛠️ 技术栈
+所有模型均使用 OpenAI 兼容 API，统一适配。
 
-- **前端**: React 18 + TypeScript + Vite
-- **状态管理**: Zustand
-- **样式**: Tailwind CSS
-- **图标**: Lucide React
-- **图表**: Recharts
-- **AI服务**: 阿里千问 (支持扩展其他模型)
+### 其他特性
+- 浅色/深色主题切换
+- 数据持久化（对话、设置、草稿保存到 localStorage）
+- 响应式布局
 
-## 🚀 快速开始
+## 技术栈
+
+- **前端框架**：React 18 + TypeScript
+- **构建工具**：Vite 5
+- **状态管理**：Zustand（带持久化中间件）
+- **样式**：Tailwind CSS 3
+- **AI SDK**：OpenAI JS SDK（兼容国产模型 API）
+- **Markdown**：react-markdown
+- **图标**：Lucide React
+
+## 快速开始
 
 ### 环境要求
 - Node.js 18+
@@ -50,11 +61,13 @@
 npm install
 ```
 
-### 开发模式运行
+### 开发模式
 
 ```bash
 npm run dev
 ```
+
+访问 http://localhost:5173/
 
 ### 构建生产版本
 
@@ -62,96 +75,56 @@ npm run dev
 npm run build
 ```
 
-## ⚙️ 配置
+## 使用说明
 
-### AI 模型配置
-1. 打开设置页面
-2. 选择默认AI模型 (目前仅支持阿里千问)
-3. 输入API密钥
-4. 保存设置
+1. **配置 AI 模型**：进入"设置"页面，选择模型并输入 API Key
+2. **智能对话**：在"聊天"页面与 AI 助手对话
+3. **账号定位**：在"定位"页面输入信息，获取定位方案
+4. **内容创作**：在"内容"页面选择平台和主题，生成适配内容
 
-### 环境变量
+### 获取 API Key
 
-在 `.env` 文件中配置：
+| 模型 | 获取地址 |
+|------|----------|
+| 通义千问 | https://dashscope.console.aliyun.com/ |
+| DeepSeek | https://platform.deepseek.com/ |
+| Kimi | https://platform.kimi.com/ |
+| 豆包 | https://console.volcengine.com/ark |
+| 文心一言 | https://console.bce.baidu.com/qianfan/ |
 
-```env
-# 阿里千问 API 密钥
-ALI_API_KEY=your_api_key
+## 项目结构
+
+```
+src/
+├── components/           # UI 组件
+│   ├── ChatView.tsx      # 聊天页面
+│   ├── PositionView.tsx  # 账号定位页面
+│   ├── ContentView.tsx   # 内容创作页面
+│   ├── SettingsView.tsx  # 设置页面
+│   └── Sidebar.tsx       # 侧边栏导航
+├── stores/               # Zustand 状态管理
+│   ├── useChatStore.ts   # 对话状态
+│   ├── useSettingsStore.ts # 设置状态
+│   ├── useDraftStore.ts  # 草稿状态
+│   └── useThemeStore.ts  # 主题状态
+├── services/             # 服务层
+│   ├── ai.ts             # AI 统一适配器
+│   └── storage.ts        # localStorage 封装
+├── prompts/              # AI 提示词模板
+│   ├── chat.ts           # 聊天系统提示词
+│   ├── platforms.ts      # 平台内容模板
+│   └── positioning.ts    # 定位分析提示词
+├── types/                # TypeScript 类型定义
+│   └── index.ts
+├── App.tsx               # 应用入口
+├── main.tsx              # 渲染入口
+└── index.css             # 全局样式 + 主题变量
 ```
 
-## 📁 项目结构
-
-```
-├── src/
-│   ├── components/          # UI组件
-│   ├── store/               # 状态管理
-│   ├── lib/                 # 工具函数和服务
-│   ├── App.tsx              # 主应用
-│   └── main.tsx             # 入口文件
-├── shared/                  # 共享类型定义
-├── api/                     # 后端API
-├── public/                  # 静态资源
-├── package.json             # 项目配置
-└── README.md               # 项目说明
-```
-
-## 🌟 核心功能
-
-### AI 对话
-- 智能理解运营问题
-- 提供专业的运营建议
-- 支持多轮对话
-- 基于上下文生成回答
-
-### 数据分析
-- 实时数据监控
-- 趋势分析图表
-- 关键指标预警
-- 数据驱动的决策建议
-
-### 任务管理
-- 创建和跟踪运营任务
-- 设置任务优先级
-- 任务状态管理
-- 任务完成度统计
-
-### 内容创作
-- 智能内容优化
-- 热点话题分析
-- 标题生成和优化
-- 内容结构建议
-
-## 📸 功能截图
-
-### 1. 聊天界面
-![聊天界面](https://img.shields.io/badge/聊天界面-功能正常-green?style=for-the-badge)
-
-### 2. 数据分析仪表盘
-![数据分析仪表盘](https://img.shields.io/badge/数据分析-功能正常-green?style=for-the-badge)
-
-### 3. 任务管理
-![任务管理](https://img.shields.io/badge/任务管理-功能正常-green?style=for-the-badge)
-
-### 4. 内容创作
-![内容创作](https://img.shields.io/badge/内容创作-功能正常-green?style=for-the-badge)
-
-### 5. 设置页面
-![设置页面](https://img.shields.io/badge/设置页面-功能正常-green?style=for-the-badge)
-
-**说明**：由于图片生成服务暂时不可用，以上为功能状态标识。实际使用时，各功能界面会显示完整的操作界面。
-
-## 🤝 贡献
-
-欢迎贡献代码、报告问题或提出建议！
-
-## 📄 许可证
+## 许可证
 
 MIT License
 
-## 📞 联系
+## 联系
 
 - GitHub: [Dream22180971](https://github.com/Dream22180971)
-
----
-
-**运营助手 Agent** - 您的智能运营伙伴！ 🎯

@@ -1,131 +1,433 @@
-import { useState } from 'react'
-import { FileEdit, TrendingUp, MessageSquare, Sparkles, Save } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { FileEdit, Copy, Check, Sparkles, AlertCircle, Save, Trash2, Clock } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import { useSettingsStore } from '../stores/useSettingsStore'
+import { useDraftStore } from '../stores/useDraftStore'
+import { chatStream } from '../services/ai'
+import { buildContentMessages } from '../prompts/platforms'
+import type { Platform, WechatMode } from '../types'
 
-const ContentView: React.FC = () => {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [isOptimizing, setIsOptimizing] = useState(false)
+const PLATFORMS: { id: Platform; label: string; desc: string }[] = [
+  { id: 'xiaohongshu', label: '小红书', desc: '种草图文风格' },
+  { id: 'douyin', label: '抖音', desc: '长文图文脚本' },
+  { id: 'wechat', label: '公众号', desc: '长文 / 贴图短文' },
+]
 
-  const handleOptimize = () => {
-    setIsOptimizing(true)
-    // 模拟AI优化过程
-    setTimeout(() => {
-      setTitle('如何在2025年提升运营效果：5个实用策略')
-      setContent('在当今竞争激烈的市场环境中，运营策略的重要性不言而喻。本文将为您分享5个实用的运营策略，帮助您在2025年实现业务增长。\n\n## 1. 数据驱动的决策\n\n利用数据分析工具，深入了解用户行为和市场趋势，制定更加精准的运营策略。\n\n## 2. 内容营销创新\n\n通过创建高质量、有价值的内容，吸引目标受众，建立品牌权威。\n\n## 3. 社交媒体优化\n\n根据不同平台的特点，制定差异化的内容策略，提高用户互动率。\n\n## 4. 用户体验提升\n\n优化产品和服务的用户体验，提高用户满意度和忠诚度。\n\n## 5. 合作与共赢\n\n与行业合作伙伴建立良好的关系，实现资源共享和优势互补。\n\n通过以上策略的实施，相信您的运营效果将会得到显著提升。')
-      setIsOptimizing(false)
-    }, 1500)
+export default function ContentView() {
+  const [platform, setPlatform] = useState<Platform>('xiaohongshu')
+  const [wechatMode, setWechatMode] = useState<WechatMode>('long')
+  const [topic, setTopic] = useState('')
+  const [extra, setExtra] = useState('')
+  const [result, setResult] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showDrafts, setShowDrafts] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+
+  const { isConfigured } = useSettingsStore()
+  const { drafts, addDraft, deleteDraft } = useDraftStore()
+
+  const handleGenerate = async () => {
+    if (!topic.trim() || isGenerating) return
+
+    if (!isConfigured()) {
+      setError('请先在设置页面配置 API Key')
+      return
+    }
+
+    setError(null)
+    setResult('')
+    setIsGenerating(true)
+    abortRef.current = new AbortController()
+
+    const messages = buildContentMessages(platform, topic, extra, platform === 'wechat' ? wechatMode : undefined)
+
+    try {
+      const { provider, apiKey, model, endpointId } = useSettingsStore.getState()
+      const stream = await chatStream({
+        provider,
+        apiKey,
+        model,
+        endpointId,
+        messages,
+        signal: abortRef.current.signal,
+      })
+
+      const reader = stream.getReader()
+      let fullContent = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        fullContent += value
+        setResult(fullContent)
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return
+      const errorMsg = err instanceof Error ? err.message : '生成失败，请重试'
+      setError(errorMsg)
+    } finally {
+      setIsGenerating(false)
+      abortRef.current = null
+    }
   }
 
-  const generateContent = () => {
-    setIsOptimizing(true)
-    // 模拟AI内容生成
-    setTimeout(() => {
-      setTitle('2025年内容营销趋势分析')
-      setContent('随着数字化转型的不断深入，内容营销也在不断演变。2025年，我们将看到以下几个重要趋势：\n\n### 1. 短视频内容的崛起\n\n短视频以其短小精悍、易于传播的特点，成为内容营销的重要形式。\n\n### 2. 个性化内容推荐\n\n基于用户数据和AI技术，为不同用户提供个性化的内容推荐。\n\n### 3. 互动式内容的流行\n\n通过互动式内容，如问答、投票、小游戏等，提高用户参与度。\n\n### 4. 内容与电商的融合\n\n将内容营销与电商紧密结合，实现从内容到转化的闭环。\n\n### 5. 社会责任内容的重要性\n\n品牌通过发布社会责任相关的内容，提升品牌形象和社会影响力。\n\n这些趋势将为内容营销带来新的机遇和挑战，企业需要及时调整策略，以适应市场的变化。')
-      setIsOptimizing(false)
-    }, 1500)
+  const handleCopy = async () => {
+    if (!result) return
+    try {
+      await navigator.clipboard.writeText(result)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      const textarea = document.createElement('textarea')
+      textarea.value = result
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
-  return (
-    <div className="h-full p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">内容创作</h2>
+  const handleSaveDraft = () => {
+    if (!result) return
+    addDraft({ platform, wechatMode, topic, extra, content: result })
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-lg flex items-center justify-center">
-            <FileEdit size={20} className="text-white" />
+  const handleLoadDraft = (draft: typeof drafts[0]) => {
+    setPlatform(draft.platform)
+    if (draft.wechatMode) setWechatMode(draft.wechatMode)
+    setTopic(draft.topic)
+    setExtra(draft.extra)
+    setResult(draft.content)
+    setShowDrafts(false)
+  }
+
+  if (!isConfigured()) {
+    return (
+      <div className="h-full flex items-center justify-center p-8" style={{ backgroundColor: 'var(--bg-primary)' }}>
+        <div className="text-center max-w-md">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+            style={{ backgroundColor: 'var(--accent-glow)' }}
+          >
+            <FileEdit size={32} style={{ color: 'var(--accent)' }} />
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">内容编辑器</h3>
-        </div>
-
-        <div className="space-y-4">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="输入标题..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg font-medium"
-          />
-          
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="输入内容..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[300px]"
-          />
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleOptimize}
-              disabled={isOptimizing}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-orange-500 to-yellow-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {isOptimizing ? <Sparkles size={18} className="animate-spin" /> : <MessageSquare size={18} />}
-              {isOptimizing ? '优化中...' : '智能优化'}
-            </button>
-            
-            <button
-              onClick={generateContent}
-              disabled={isOptimizing}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-            >
-              <TrendingUp size={18} />
-              生成示例内容
-            </button>
-            
-            <button
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-            >
-              <Save size={18} />
-              保存
-            </button>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
+            内容创作
+          </h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+            请先在设置页面配置 AI 模型的 API Key，即可使用内容生成功能。
+          </p>
+          <div className="inline-flex items-center gap-2 text-sm" style={{ color: 'var(--accent)' }}>
+            <AlertCircle size={16} />
+            <span>点击左侧"设置"进行配置</span>
           </div>
         </div>
       </div>
+    )
+  }
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">内容建议</h3>
-          <div className="space-y-3">
-            <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-              <h4 className="font-medium text-gray-800">热门话题：AI在运营中的应用</h4>
-              <p className="text-sm text-gray-600 mt-1">探讨AI如何提升运营效率和效果</p>
-            </div>
-            <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-              <h4 className="font-medium text-gray-800">案例分析：成功的内容营销策略</h4>
-              <p className="text-sm text-gray-600 mt-1">分析行业领先企业的内容营销成功案例</p>
-            </div>
-            <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-              <h4 className="font-medium text-gray-800">趋势预测：2025年运营方向</h4>
-              <p className="text-sm text-gray-600 mt-1">预测2025年运营领域的发展趋势</p>
-            </div>
+  return (
+    <div className="h-full overflow-y-auto p-6" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
+            内容创作
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            选择平台，输入主题，一键生成适配内容
+          </p>
+        </div>
+
+        {/* Platform Selection */}
+        <div className="mb-6">
+          <label className="block text-xs font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>
+            选择平台
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {PLATFORMS.map((p) => {
+              const isActive = platform === p.id
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPlatform(p.id)}
+                  className="p-4 rounded-xl border text-left transition-all duration-200"
+                  style={{
+                    backgroundColor: isActive ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
+                    borderColor: isActive ? 'var(--accent)' : 'var(--border-color)',
+                    boxShadow: isActive ? '0 0 20px var(--accent-glow)' : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.currentTarget.style.borderColor = 'var(--text-muted)'
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) e.currentTarget.style.borderColor = 'var(--border-color)'
+                  }}
+                >
+                  <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                    {p.label}
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    {p.desc}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">AI写作助手</h3>
+        {/* WeChat Sub-mode */}
+        {platform === 'wechat' && (
+          <div className="mb-6">
+            <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>
+              内容类型
+            </label>
+            <div className="flex gap-2">
+              {(['long', 'short'] as WechatMode[]).map((mode) => {
+                const isActive = wechatMode === mode
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => setWechatMode(mode)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                    style={{
+                      backgroundColor: isActive ? 'var(--accent)' : 'var(--bg-secondary)',
+                      color: isActive ? 'white' : 'var(--text-secondary)',
+                      border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border-color)'}`,
+                    }}
+                  >
+                    {mode === 'long' ? '长文' : '贴图短文'}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Drafts Toggle */}
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={() => setShowDrafts(!showDrafts)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+            style={{
+              backgroundColor: showDrafts ? 'var(--accent-glow)' : 'var(--bg-secondary)',
+              color: showDrafts ? 'var(--accent)' : 'var(--text-muted)',
+              border: `1px solid ${showDrafts ? 'var(--accent)' : 'var(--border-color)'}`,
+            }}
+          >
+            <Clock size={12} />
+            草稿箱 ({drafts.length})
+          </button>
+        </div>
+
+        {/* Drafts Panel */}
+        {showDrafts && (
+          <div
+            className="rounded-xl border p-4 mb-6 max-h-64 overflow-y-auto"
+            style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+          >
+            {drafts.length === 0 ? (
+              <p className="text-sm text-center py-4" style={{ color: 'var(--text-muted)' }}>
+                暂无草稿
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {drafts.map((draft) => {
+                  const platformLabel = PLATFORMS.find((p) => p.id === draft.platform)?.label || draft.platform
+                  return (
+                    <div
+                      key={draft.id}
+                      className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors"
+                      style={{ backgroundColor: 'var(--bg-tertiary)' }}
+                      onClick={() => handleLoadDraft(draft)}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--accent-glow)', color: 'var(--accent)' }}>
+                            {platformLabel}
+                          </span>
+                          <span className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                            {draft.topic}
+                          </span>
+                        </div>
+                        <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
+                          {draft.content.slice(0, 60)}...
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                          {new Date(draft.createdAt).toLocaleDateString('zh-CN')}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            deleteDraft(draft.id)
+                          }}
+                          className="p-1 rounded transition-colors"
+                          style={{ color: 'var(--text-muted)' }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Input Area */}
+        <div
+          className="rounded-xl border p-6 mb-6"
+          style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+        >
           <div className="space-y-4">
-            <div className="p-4 border border-orange-200 bg-orange-50 rounded-lg">
-              <h4 className="font-medium text-orange-800 mb-2">标题建议</h4>
-              <ul className="space-y-2 text-sm">
-                <li className="text-gray-700 hover:text-orange-600 cursor-pointer">如何利用AI提升运营效果</li>
-                <li className="text-gray-700 hover:text-orange-600 cursor-pointer">2025年运营策略指南</li>
-                <li className="text-gray-700 hover:text-orange-600 cursor-pointer">内容营销的未来发展趋势</li>
-              </ul>
+            <div>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                主题 / 关键词
+              </label>
+              <input
+                type="text"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="例如：2025年春季护肤攻略"
+                className="w-full px-4 py-3 rounded-lg border text-sm transition-colors focus:outline-none"
+                style={{
+                  backgroundColor: 'var(--bg-tertiary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)',
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+              />
             </div>
-            <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
-              <h4 className="font-medium text-yellow-800 mb-2">内容结构</h4>
-              <p className="text-sm text-gray-700">建议采用"引言-主体-结论"的结构，主体部分可分为3-5个小节，每小节集中讨论一个主题。</p>
+            <div>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                补充说明（可选）
+              </label>
+              <textarea
+                value={extra}
+                onChange={(e) => setExtra(e.target.value)}
+                placeholder="例如：重点推荐平价好物，面向学生群体"
+                rows={2}
+                className="w-full px-4 py-3 rounded-lg border text-sm resize-none transition-colors focus:outline-none"
+                style={{
+                  backgroundColor: 'var(--bg-tertiary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)',
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+              />
             </div>
-            <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
-              <h4 className="font-medium text-green-800 mb-2">写作技巧</h4>
-              <p className="text-sm text-gray-700">使用简洁明了的语言，避免专业术语过多；加入具体案例和数据，增强说服力；保持逻辑清晰，结构合理。</p>
-            </div>
+            <button
+              onClick={handleGenerate}
+              disabled={!topic.trim() || isGenerating}
+              className="w-full py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all duration-200"
+              style={{
+                backgroundColor: topic.trim() && !isGenerating ? 'var(--accent)' : 'var(--bg-tertiary)',
+                color: topic.trim() && !isGenerating ? 'white' : 'var(--text-muted)',
+              }}
+              onMouseEnter={(e) => {
+                if (topic.trim() && !isGenerating) e.currentTarget.style.opacity = '0.9'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1'
+              }}
+            >
+              {isGenerating ? (
+                <>
+                  <div
+                    className="w-4 h-4 border-2 rounded-full animate-spin"
+                    style={{ borderColor: 'var(--text-muted)', borderTopColor: 'var(--accent)' }}
+                  />
+                  生成中...
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} />
+                  生成内容
+                </>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Error */}
+        {error && (
+          <div
+            className="mb-6 px-4 py-3 rounded-lg text-sm flex items-center gap-2"
+            style={{ backgroundColor: 'rgba(248,113,113,0.1)', color: 'var(--error)', border: '1px solid rgba(248,113,113,0.2)' }}
+          >
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        {/* Result */}
+        {result && (
+          <div
+            className="rounded-xl border p-6"
+            style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                生成结果
+              </h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveDraft}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: saved ? 'rgba(52,211,153,0.15)' : 'var(--bg-tertiary)',
+                    color: saved ? 'var(--success)' : 'var(--text-muted)',
+                    border: `1px solid ${saved ? 'rgba(52,211,153,0.3)' : 'var(--border-color)'}`,
+                  }}
+                >
+                  {saved ? <Check size={12} /> : <Save size={12} />}
+                  {saved ? '已保存' : '存草稿'}
+                </button>
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: copied ? 'rgba(52,211,153,0.15)' : 'var(--bg-tertiary)',
+                    color: copied ? 'var(--success)' : 'var(--text-muted)',
+                    border: `1px solid ${copied ? 'rgba(52,211,153,0.3)' : 'var(--border-color)'}`,
+                  }}
+                >
+                  {copied ? <Check size={12} /> : <Copy size={12} />}
+                  {copied ? '已复制' : '复制'}
+                </button>
+              </div>
+            </div>
+            <div
+              className="text-sm leading-relaxed prose prose-sm max-w-none"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              <ReactMarkdown>{result}</ReactMarkdown>
+            </div>
+            {isGenerating && (
+              <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: 'var(--accent)' }}>
+                <div
+                  className="w-3 h-3 border-2 rounded-full animate-spin"
+                  style={{ borderColor: 'var(--accent-glow)', borderTopColor: 'var(--accent)' }}
+                />
+                正在生成...
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
-export default ContentView
