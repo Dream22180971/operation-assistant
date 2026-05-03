@@ -1,6 +1,9 @@
 # 运营 AI 内容助手
 
 一个面向自媒体运营人的 AI 内容生成工具，支持账号定位、多平台内容创作和智能对话。
+<img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/016db503-0482-4a43-bffa-12cc414d6aaf" />
+
+<img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/1a81b155-ec13-42ff-b2da-eeb782f64105" />
 
 ## 功能特性
 
