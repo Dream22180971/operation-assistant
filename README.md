@@ -15,7 +15,7 @@
 
 ---
 
-## What it is
+## 🎯 What it is
 
 Operation Assistant is a local-first AI writing workspace for creators who publish the same topic across different Chinese content platforms.
 
@@ -23,7 +23,7 @@ Instead of repeatedly prompting a general chatbot, it keeps platform-specific wr
 
 ---
 
-## Demo
+## 🎬 Demo
 
 <div align="center">
 
@@ -35,7 +35,7 @@ Instead of repeatedly prompting a general chatbot, it keeps platform-specific wr
 
 ---
 
-## Quick Start
+## ⚡ Quick Start
 
 ```bash
 git clone https://github.com/Dream22180971/operation-assistant.git
@@ -51,7 +51,7 @@ Configure at least one supported model/API key in the app settings before genera
 
 ---
 
-## Core Workflows
+## ✨ Core Workflows
 
 | Workflow | Purpose |
 |---|---|
@@ -64,7 +64,7 @@ Configure at least one supported model/API key in the app settings before genera
 
 ---
 
-## Model Layer
+## 🧠 Model Layer
 
 The app uses an OpenAI-compatible client pattern so multiple providers can share one integration style.
 
@@ -72,7 +72,7 @@ Provider support depends on the endpoint and key configured by the user.
 
 ---
 
-## Privacy
+## 🔐 Privacy
 
 - drafts and conversations are stored locally in the browser
 - API keys are handled on the client side
@@ -82,7 +82,7 @@ Because keys are client-side, use this primarily as a personal/local tool unless
 
 ---
 
-## Architecture
+## 🧩 Architecture
 
 ```text
 React 18 + Vite
@@ -95,7 +95,7 @@ React 18 + Vite
 
 ---
 
-## Roadmap
+## 🗺 Roadmap
 
 - [x] AI chat
 - [x] account positioning
@@ -110,7 +110,7 @@ React 18 + Vite
 
 ---
 
-## License
+## 📄 License
 
 [MIT](./LICENSE)
 
