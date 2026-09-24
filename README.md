@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Space+Grotesk&weight=700&size=30&duration=2300&pause=900&color=EC4899&center=true&vCenter=true&width=900&lines=ONE+TOPIC%2C+MULTIPLE+PLATFORMS;AI+CONTENT+WORKFLOW+FOR+CREATORS" alt="Typing SVG" />
-
 # Operation Assistant
 
 **Generate platform-specific content for Xiaohongshu, Douyin and WeChat from one topic.**
