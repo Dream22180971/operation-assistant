@@ -20,6 +20,39 @@ npm install
 npm run dev
 ```
 
+> **EN:** Clone, install, run. Advanced configuration and project-specific details are documented below.  
+> **中文：** 克隆、安装、运行即可开始。高级配置和项目特定说明继续保留在下方。
+
+## Why this project / 为什么做这个项目
+
+**EN:** This project starts from one concrete problem and prioritizes being understandable, runnable and useful before becoming complex.
+
+**中文：** 这个项目从一个明确问题出发，优先做到易理解、能运行、真正有用，再逐步增加复杂能力。
+
+---
+
+Generate platform-specific content for Xiaohongshu, Douyin and WeChat from one topic. / 输入一个选题，自动生成适配小红书、抖音和公众号的内容。
+
+<!-- README-V2-BILINGUAL -->
+
+# operation-assistant
+
+> **EN:** Generate platform-specific content for Xiaohongshu, Douyin and WeChat from one topic.  
+> **中文：** 输入一个选题，自动生成适配小红书、抖音和公众号的内容。
+
+## Demo / 演示
+
+Existing product screenshots are kept immediately below in the original documentation. / 原文档中的产品截图继续保留。
+
+## Quick Start / 5 分钟快速开始
+
+```bash
+git clone https://github.com/Dream22180971/operation-assistant.git
+cd operation-assistant
+npm install
+npm run dev
+```
+
 > **EN:** The commands above are intentionally kept short: clone, install, run. Project-specific configuration and advanced usage stay in the detailed documentation below.  
 > **中文：** 上面的命令刻意保持最短路径：克隆、安装、运行。项目特定配置与高级用法继续保留在下方详细文档中。
 
