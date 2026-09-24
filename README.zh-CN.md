@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Space+Grotesk&weight=700&size=30&duration=2300&pause=900&color=EC4899&center=true&vCenter=true&width=900&lines=ONE+TOPIC%2C+MULTIPLE+PLATFORMS;AI+CONTENT+WORKFLOW+FOR+CREATORS" alt="Typing SVG" />
-
 # 运营 AI 内容助手
 
 **输入一个选题，生成适配小红书、抖音和公众号的不同版本。**
