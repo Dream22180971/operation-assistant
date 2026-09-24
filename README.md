@@ -31,40 +31,6 @@ npm run dev
 
 ---
 
-Generate platform-specific content for Xiaohongshu, Douyin and WeChat from one topic. / 输入一个选题，自动生成适配小红书、抖音和公众号的内容。
-
-<!-- README-V2-BILINGUAL -->
-
-# operation-assistant
-
-> **EN:** Generate platform-specific content for Xiaohongshu, Douyin and WeChat from one topic.  
-> **中文：** 输入一个选题，自动生成适配小红书、抖音和公众号的内容。
-
-## Demo / 演示
-
-Existing product screenshots are kept immediately below in the original documentation. / 原文档中的产品截图继续保留。
-
-## Quick Start / 5 分钟快速开始
-
-```bash
-git clone https://github.com/Dream22180971/operation-assistant.git
-cd operation-assistant
-npm install
-npm run dev
-```
-
-> **EN:** The commands above are intentionally kept short: clone, install, run. Project-specific configuration and advanced usage stay in the detailed documentation below.  
-> **中文：** 上面的命令刻意保持最短路径：克隆、安装、运行。项目特定配置与高级用法继续保留在下方详细文档中。
-
-## Why this project / 为什么做这个项目
-
-**EN:** This repository is built around one concrete problem and aims to be understandable, runnable and useful before becoming complex.
-
-**中文：** 这个仓库围绕一个明确问题构建，优先做到易理解、能运行、真正有用，再逐步增加复杂能力。
-
----
-
-<!-- ORIGINAL-DOCS -->
 # 运营 AI 内容助手
 
 > 自媒体运营人的 AI 写作工具——输入选题，自动适配小红书 / 抖音 / 公众号风格生成内容。
