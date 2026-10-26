@@ -45,7 +45,7 @@ export function buildPositioningMessages(
     wechat: '微信公众号',
   }
 
-  let userPrompt = `请帮我做一个账号定位分析：
+  const userPrompt = `请帮我做一个账号定位分析：
 
 - 擅长领域/兴趣：${field}
 - 目标平台：${platformNames[platform]}
