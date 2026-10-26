@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Bot, Send, TrendingUp, FileText, Sparkles, BarChart3, AlertCircle, Copy, Check } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { useChatStore, createMessage } from '../stores/useChatStore'
@@ -25,7 +25,8 @@ export default function ChatView() {
   const { isConfigured } = useSettingsStore()
 
   const currentConversation = conversations.find((c) => c.id === currentConversationId)
-  const messages = currentConversation?.messages || []
+  // 没有会话时 `|| []` 每次渲染都是新数组，会让下面的滚动 effect 每次渲染都触发
+  const messages = useMemo(() => currentConversation?.messages || [], [currentConversation])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
