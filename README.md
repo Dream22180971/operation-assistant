@@ -1,41 +1,39 @@
 <div align="center">
 
-# Operation Assistant
+# 运营 AI 内容助手
 
-**Generate platform-specific content for Xiaohongshu, Douyin and WeChat from one topic.**
+**输入一个选题，生成适配小红书、抖音和公众号的不同版本。**
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+[简体中文](./README.md) | [English](./README.en.md)
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
-[![Local Storage](https://img.shields.io/badge/STORAGE-localStorage-111827?style=for-the-badge)](#privacy)
+[![Local Storage](https://img.shields.io/badge/STORAGE-localStorage-111827?style=for-the-badge)](#隐私)
 [![License](https://img.shields.io/badge/LICENSE-MIT-10B981?style=for-the-badge)](./LICENSE)
 
 </div>
 
 ---
 
-## 🎯 What it is
+## 🎯 它是什么
 
-Operation Assistant is a local-first AI writing workspace for creators who publish the same topic across different Chinese content platforms.
-
-Instead of repeatedly prompting a general chatbot, it keeps platform-specific writing flows in one UI.
+一个面向内容创作者的本地 AI 写作工作台。核心不是“再做一个聊天框”，而是把同一个选题在不同平台的写法固定成可重复使用的流程。
 
 ---
 
-## 🎬 Demo
+## 🎬 演示
 
 <div align="center">
 
-<img width="92%" alt="Operation Assistant chat" src="https://github.com/user-attachments/assets/016db503-0482-4a43-bffa-12cc414d6aaf" />
+<img width="92%" alt="运营助手聊天界面" src="https://github.com/user-attachments/assets/016db503-0482-4a43-bffa-12cc414d6aaf" />
 
-<img width="92%" alt="Operation Assistant content generation" src="https://github.com/user-attachments/assets/1a81b155-ec13-42ff-b2da-eeb782f64105" />
+<img width="92%" alt="运营助手内容生成" src="https://github.com/user-attachments/assets/1a81b155-ec13-42ff-b2da-eeb782f64105" />
 
 </div>
 
 ---
 
-## ⚡ Quick Start
+## ⚡ 5 分钟快速开始
 
 ```bash
 git clone https://github.com/Dream22180971/operation-assistant.git
@@ -45,68 +43,68 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+访问 `http://localhost:5173`。
 
-Configure at least one supported model/API key in the app settings before generating content.
+生成内容前，请在设置中配置至少一个可用模型/API Key。
 
 ---
 
-## ✨ Core Workflows
+## ✨ 核心流程
 
-| Workflow | Purpose |
+| 流程 | 作用 |
 |---|---|
-| Account positioning | analyze niche, persona and differentiation |
-| Xiaohongshu | generate short, visual, platform-style copy |
-| Douyin | generate more conversational script-style content |
-| WeChat | generate longer-form article drafts |
-| AI chat | brainstorm topics, hooks, rewrites and positioning |
-| Draft history | keep recent generated content locally |
+| 账号定位 | 分析赛道、人设和差异化 |
+| 小红书 | 生成短段落、平台化图文初稿 |
+| 抖音 | 生成更口语化的脚本内容 |
+| 公众号 | 生成长文初稿 |
+| AI 对话 | 选题、Hook、改写、定位讨论 |
+| 草稿历史 | 在本地保留最近生成内容 |
 
 ---
 
-## 🧠 Model Layer
+## 🧠 模型层
 
-The app uses an OpenAI-compatible client pattern so multiple providers can share one integration style.
+项目使用 OpenAI-compatible 的客户端思路，让多个供应商尽量复用同一套接入方式。
 
-Provider support depends on the endpoint and key configured by the user.
-
----
-
-## 🔐 Privacy
-
-- drafts and conversations are stored locally in the browser
-- API keys are handled on the client side
-- there is no built-in cloud account system
-
-Because keys are client-side, use this primarily as a personal/local tool unless you add a secure backend proxy.
+具体可用模型取决于用户配置的 Endpoint 和 Key。
 
 ---
 
-## 🧩 Architecture
+## 🔐 隐私
+
+- 草稿和对话保存在浏览器本地
+- API Key 在客户端侧使用
+- 当前没有内置云端账号体系
+
+因为 Key 位于客户端侧，这个版本更适合个人本地使用；如果用于多人或生产环境，建议增加安全的后端代理层。
+
+---
+
+## 🧩 技术架构
 
 ```text
 React 18 + Vite
       │
-      ├── platform prompt workflows
-      ├── OpenAI-compatible model adapters
-      ├── Zustand state
-      └── localStorage drafts / settings
+      ├── 多平台 Prompt 工作流
+      ├── OpenAI-compatible 模型适配
+      ├── Zustand 状态管理
+      └── localStorage 草稿 / 设置
 ```
 
 ---
 
-## 🗺 Roadmap
+## 🗺 路线图
 
-- [x] AI chat
-- [x] account positioning
-- [x] Xiaohongshu / Douyin / WeChat generation
-- [x] multiple model providers
-- [x] draft history
-- [ ] secure backend API proxy
-- [ ] more publishing platforms
-- [ ] analytics-assisted rewriting
-- [ ] content calendar
-- [ ] team workflow
+- [x] AI 对话
+- [x] 账号定位
+- [x] 小红书 / 抖音 / 公众号生成
+- [x] 多模型接入
+- [x] 草稿历史
+- [ ] 安全后端 API Proxy
+- [ ] 更多平台
+- [ ] 数据辅助改写
+- [ ] 内容日历
+- [ ] 团队工作流
 
 ---
 
@@ -116,6 +114,6 @@ React 18 + Vite
 
 <div align="center">
 
-**One topic should not require three blank pages.**
+**一个选题，不应该从三张空白页重新开始。**
 
 </div>
